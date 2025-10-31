@@ -1,0 +1,22 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+/generated/prisma
+
+.DS_Store
+/build
+/dist
+/logs
+
+backend/node_modules
+backend/.env
+backend/generated/prisma
+backend/.DS_Store
+backend/build
+backend/dist
+
+frontend/drug_store/node_modules
+frontend/drug_store/.env
+frontend/drug_store/.DS_Store
+frontend/drug_store/build
