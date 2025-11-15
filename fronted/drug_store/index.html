@@ -2,12 +2,460 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>drug_store</title>
+    <title>ILLEGAL STORE ☠️</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+        }
+
+        body.intro-active {
+            background: #000;
+            overflow: hidden;
+        }
+
+        .block {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            will-change: transform, opacity;
+        }
+
+        #intro-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            pointer-events: auto;
+        }
+
+        .intro-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .letter-wrapper {
+            display: inline-block;
+            overflow: hidden;
+            height: 8rem;
+            vertical-align: bottom;
+            margin: 0 0.2rem;
+            border-radius: 10px;
+            will-change: transform;
+        }
+
+        .letter-slot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            will-change: transform;
+        }
+
+        .letter {
+            font-size: 6rem;
+            font-weight: bold;
+            display: block;
+            line-height: 8rem;
+            height: 8rem;
+            will-change: transform;
+        }
+
+        .space {
+            display: inline-block;
+            width: 2rem;
+        }
+
+        .skull {
+            font-size: 7rem;
+            display: inline-block;
+            animation: skullFloat 2s ease-in-out infinite;
+        }
+
+        @keyframes skullFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        .text-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .glow-effect {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            animation: pulse 2s ease-in-out infinite;
+            z-index: 5;
+            border-radius: 50%;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        .scanline {
+            position: fixed;
+            width: 100%;
+            height: 2px;
+            top: 0;
+            animation: scan 3s linear infinite;
+            z-index: 15;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        .theme-fire .block {
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+        }
+        .theme-fire .letter {
+            color: #ff6b35;
+            text-shadow: 0 0 40px rgba(255, 107, 53, 1), 0 0 80px rgba(255, 107, 53, 0.5);
+        }
+        .theme-fire .skull {
+            filter: drop-shadow(0 0 30px rgba(255, 107, 53, 1));
+        }
+        .theme-fire .glow-effect {
+            background: radial-gradient(circle, rgba(255, 107, 53, 0.3) 0%, transparent 70%);
+        }
+        .theme-fire .scanline {
+            background: rgba(255, 107, 53, 0.1);
+        }
+
+        .theme-cyber .block {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+        }
+        .theme-cyber .letter {
+            color: #8b5cf6;
+            text-shadow: 0 0 40px rgba(139, 92, 246, 1), 0 0 80px rgba(139, 92, 246, 0.5);
+        }
+        .theme-cyber .skull {
+            filter: drop-shadow(0 0 30px rgba(139, 92, 246, 1));
+        }
+        .theme-cyber .glow-effect {
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
+        }
+        .theme-cyber .scanline {
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .theme-neon .block {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+        }
+        .theme-neon .letter {
+            color: #10b981;
+            text-shadow: 0 0 40px rgba(16, 185, 129, 1), 0 0 80px rgba(16, 185, 129, 0.5);
+        }
+        .theme-neon .skull {
+            filter: drop-shadow(0 0 30px rgba(16, 185, 129, 1));
+        }
+        .theme-neon .glow-effect {
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, transparent 70%);
+        }
+        .theme-neon .scanline {
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .theme-blood .block {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+        }
+        .theme-blood .letter {
+            color: #dc2626;
+            text-shadow: 0 0 40px rgba(220, 38, 38, 1), 0 0 80px rgba(220, 38, 38, 0.5);
+        }
+        .theme-blood .skull {
+            filter: drop-shadow(0 0 30px rgba(220, 38, 38, 1));
+        }
+        .theme-blood .glow-effect {
+            background: radial-gradient(circle, rgba(220, 38, 38, 0.3) 0%, transparent 70%);
+        }
+        .theme-blood .scanline {
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        .theme-electric .block {
+            background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.5);
+        }
+        .theme-electric .letter {
+            color: #0ea5e9;
+            text-shadow: 0 0 40px rgba(14, 165, 233, 1), 0 0 80px rgba(14, 165, 233, 0.5);
+        }
+        .theme-electric .skull {
+            filter: drop-shadow(0 0 30px rgba(14, 165, 233, 1));
+        }
+        .theme-electric .glow-effect {
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.3) 0%, transparent 70%);
+        }
+        .theme-electric .scanline {
+            background: rgba(14, 165, 233, 0.1);
+        }
+
+        .theme-gold .block {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+        }
+        .theme-gold .letter {
+            color: #f59e0b;
+            text-shadow: 0 0 40px rgba(245, 158, 11, 1), 0 0 80px rgba(245, 158, 11, 0.5);
+        }
+        .theme-gold .skull {
+            filter: drop-shadow(0 0 30px rgba(245, 158, 11, 1));
+        }
+        .theme-gold .glow-effect {
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.3) 0%, transparent 70%);
+        }
+        .theme-gold .scanline {
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .letter {
+                font-size: 3rem;
+                line-height: 4rem;
+                height: 4rem;
+            }
+            .letter-wrapper {
+                height: 4rem;
+            }
+            .skull {
+                font-size: 3.5rem;
+            }
+            .space {
+                width: 1rem;
+            }
+            .block {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
   </head>
   <body>
+    <div id="intro-overlay">
+        <div class="glow-effect"></div>
+        <div class="scanline"></div>
+        <div class="vignette"></div>
+        <div id="blocks"></div>
+
+        <div class="intro-container">
+            <div class="text-container" id="textContainer"></div>
+        </div>
+    </div>
+
     <div id="root"></div>
+
+    <script>
+        const themes = ['theme-fire', 'theme-cyber', 'theme-neon', 'theme-blood', 'theme-electric', 'theme-gold'];
+        const selectedTheme = themes[Math.floor(Math.random() * themes.length)];
+        document.body.classList.add('intro-active', selectedTheme);
+
+        const introOverlay = document.getElementById('intro-overlay');
+        const blocksContainer = document.getElementById('blocks');
+        const textContainer = document.getElementById('textContainer');
+
+        const blockSize = window.innerWidth < 768 ? 50 : 100;
+        const cols = Math.ceil(window.innerWidth / blockSize);
+        const rows = Math.ceil(window.innerHeight / blockSize);
+
+        const blocks = [];
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < cols; j++) {
+                const block = document.createElement('div');
+                block.className = 'block';
+                block.style.left = j * blockSize + 'px';
+                block.style.top = i * blockSize + 'px';
+                block.style.width = blockSize + 'px';
+                block.style.height = blockSize + 'px';
+                fragment.appendChild(block);
+                blocks.push(block);
+            }
+        }
+        blocksContainer.appendChild(fragment);
+
+        const targetText = 'ILLEGAL STORE';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*';
+
+        targetText.split('').forEach((targetChar, index) => {
+            if (targetChar === ' ') {
+                const space = document.createElement('span');
+                space.className = 'space';
+                textContainer.appendChild(space);
+            } else {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'letter-wrapper';
+
+                const slot = document.createElement('div');
+                slot.className = 'letter-slot';
+
+                const numLetters = 15;
+                for (let i = 0; i < numLetters; i++) {
+                    const letter = document.createElement('span');
+                    letter.className = 'letter';
+                    if (i === numLetters - 1) {
+                        letter.textContent = targetChar;
+                    } else {
+                        letter.textContent = characters[Math.floor(Math.random() * characters.length)];
+                    }
+                    slot.appendChild(letter);
+                }
+
+                wrapper.appendChild(slot);
+                textContainer.appendChild(wrapper);
+            }
+        });
+
+        const skull = document.createElement('span');
+        skull.className = 'skull';
+        skull.textContent = ' ☠️';
+        skull.style.opacity = '0';
+        textContainer.appendChild(skull);
+
+        const letterSlots = document.querySelectorAll('.letter-slot');
+        const letterWrappers = document.querySelectorAll('.letter-wrapper');
+        const letterHeight = window.innerWidth < 768 ? 64 : 128;
+
+        const timeline = gsap.timeline();
+
+        gsap.set(blocks, { scale: 0 });
+        timeline.to(blocks, {
+            scale: 1,
+            duration: 0.02,
+            stagger: {
+                amount: 0.6,
+                from: "random"
+            },
+            ease: "back.out(1.5)"
+        });
+
+        timeline.to(blocks, {
+            scale: 0,
+            opacity: 0,
+            rotation: 90,
+            duration: 0.04,
+            stagger: {
+                amount: 0.8,
+                from: "center"
+            },
+            ease: "power2.in",
+            onComplete: () => {
+                blocksContainer.style.display = 'none';
+            }
+        }, "+=0.2");
+
+        timeline.fromTo(letterWrappers,
+            { scaleY: 0, opacity: 0 },
+            {
+                scaleY: 1,
+                opacity: 1,
+                duration: 0.4,
+                stagger: 0.04,
+                ease: "back.out(1.5)"
+            },
+            "-=0.4"
+        );
+
+        letterSlots.forEach((slot, index) => {
+            const numLetters = slot.children.length;
+            const totalDistance = (numLetters - 1) * letterHeight;
+
+            timeline.fromTo(slot,
+                {
+                    y: 0
+                },
+                {
+                    y: -totalDistance,
+                    duration: 2,
+                    ease: "power3.out"
+                },
+                index === 0 ? "-=0.2" : "<"
+            );
+        });
+
+        timeline.to(letterWrappers, {
+            x: 3,
+            duration: 0.03,
+            yoyo: true,
+            repeat: 3,
+            ease: "power2.inOut"
+        }, "-=0.3");
+
+        timeline.fromTo(skull,
+            { opacity: 0, scale: 0, rotation: -180 },
+            {
+                opacity: 1,
+                scale: 1.3,
+                rotation: 0,
+                duration: 0.6,
+                ease: "elastic.out(1, 0.5)"
+            },
+            "-=0.2"
+        );
+
+        timeline.to(skull, {
+            scale: 1,
+            duration: 0.4,
+            ease: "power2.out"
+        });
+
+        timeline.to('.text-container', {
+            scale: 1.02,
+            duration: 3,
+            ease: "sine.inOut"
+        });
+
+        timeline.to(introOverlay, {
+            opacity: 0,
+            duration: 1.2,
+            delay: 1,
+            ease: "power2.out",
+            onComplete: () => {
+                introOverlay.style.display = 'none';
+                document.body.classList.remove('intro-active', selectedTheme);
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
