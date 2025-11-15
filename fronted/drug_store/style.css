@@ -1,0 +1,209 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Courier New', monospace;
+}
+
+body.intro-active {
+  background: linear-gradient(180deg, #2a2a2a 0%, #000000 100%);
+  overflow: hidden;
+}
+
+.block {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #404040 100%);
+  box-shadow: 0 0 10px rgba(100, 100, 100, 0.3);
+  will-change: transform, opacity;
+}
+
+#intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: auto;
+}
+
+.intro-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.letter-wrapper {
+  display: inline-block;
+  overflow: hidden;
+  height: 8rem;
+  vertical-align: bottom;
+  margin: 0 0.2rem;
+  border-radius: 10px;
+  will-change: transform;
+}
+
+.letter-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  will-change: transform;
+}
+
+.letter {
+  font-size: 6rem;
+  font-weight: bold;
+  display: block;
+  line-height: 8rem;
+  height: 8rem;
+  will-change: transform;
+  color: #000;
+  text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.space {
+  display: inline-block;
+  width: 2rem;
+}
+
+.skull {
+  font-size: 7rem;
+  display: inline-block;
+  animation: skullFloat 2s ease-in-out infinite;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.skull.interactive {
+  filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.35));
+}
+
+@keyframes skullFloat {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(5deg);
+  }
+}
+
+.text-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.glow-effect {
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: pulse 2s ease-in-out infinite;
+  z-index: 5;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(80, 80, 80, 0.2) 0%, transparent 70%);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+.scanline {
+  position: fixed;
+  width: 100%;
+  height: 2px;
+  top: 0;
+  animation: scan 3s linear infinite;
+  z-index: 15;
+  background: rgba(100, 100, 100, 0.1);
+}
+
+@keyframes scan {
+  0% {
+    top: 0;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+.vignette {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  z-index: 20;
+}
+
+.hint-wrapper {
+  position: fixed;
+  top: 2rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.hint-message {
+  color: #f5f5f5;
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
+  max-width: 90%;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.hint-message.visible {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .letter {
+    font-size: 3rem;
+    line-height: 4rem;
+    height: 4rem;
+  }
+  .letter-wrapper {
+    height: 4rem;
+  }
+  .skull {
+    font-size: 3.5rem;
+  }
+  .space {
+    width: 1rem;
+  }
+  .block {
+    width: 25px;
+    height: 25px;
+  }
+  .hint-message {
+    font-size: 0.95rem;
+  }
+}
