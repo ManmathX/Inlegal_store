@@ -7,10 +7,10 @@ const PORT = 3001;
 const app = express()
 
 app.use(express.json())
-app.use(cors({ origin: ['http://localhost:5173','http://localhost:3000'] }))
-app.use('/post',route)
-app.use('/user',routes)
+app.use(cors())
+app.use('/post', route)
+app.use('/user', routes)
 app.use('/product', productRoute)
-app.listen(PORT,()=>{
+app.listen(PORT, () => {
     console.log(`sever running on port ${PORT}`)
 })
