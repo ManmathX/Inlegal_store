@@ -16,11 +16,9 @@ export default function Layout() {
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #0a0a0a 100%)',
-      backgroundAttachment: 'fixed'
     }}>
       <nav style={{
-        background: 'rgba(20, 20, 20, 0.9)',
+        background: 'rgba(20, 20, 20, 0.95)',
         backdropFilter: 'blur(20px)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
         color: 'white',
@@ -31,7 +29,7 @@ export default function Layout() {
         position: 'sticky',
         top: 0,
         zIndex: 1000,
-        boxShadow: '0 4px 30px rgba(0, 0, 0, 0.3)'
+        boxShadow: '0 4px 30px rgba(0, 0, 0, 0.5)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
           <div style={{ fontSize: '1.5em', fontWeight: 'bold', color: '#fff', letterSpacing: '-0.02em' }}>
@@ -139,7 +137,15 @@ export default function Layout() {
         flex: 1,
         padding: '32px 48px',
         width: '100%',
-        animation: 'fadeIn 0.6s ease-out'
+        animation: 'fadeIn 0.6s ease-out',
+        background: 'rgba(0, 0, 0, 0.75)',
+        backdropFilter: 'blur(20px)',
+        margin: '24px auto',
+        maxWidth: '1200px',
+        borderRadius: '16px',
+        boxShadow: '0 0 40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+        border: '1px solid rgba(255, 255, 255, 0.05)',
+        color: '#e0e0e0'
       }}>
         <Outlet />
       </main>
@@ -148,7 +154,7 @@ export default function Layout() {
         padding: '24px',
         color: 'rgba(255, 255, 255, 0.5)',
         borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-        background: 'rgba(20, 20, 20, 0.8)',
+        background: 'rgba(20, 20, 20, 0.95)',
         backdropFilter: 'blur(10px)'
       }}>
         <p style={{ margin: 0, fontSize: '0.9em' }}>

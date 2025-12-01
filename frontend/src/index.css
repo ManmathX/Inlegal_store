@@ -36,6 +36,11 @@ body {
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-image: url('/src/assets/background_sketches.png');
+  background-size: 400px;
+  background-repeat: repeat;
+  background-attachment: fixed;
+  background-color: #1a1a1a;
 }
 
 input::placeholder {
