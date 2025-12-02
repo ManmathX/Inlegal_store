@@ -1,19 +1,28 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../AuthContext'
 import videoBackground from '../assets/4490828-uhd_3840_2160_25fps.mp4'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
-    if (email && password) {
-      login()
+    setError('')
+    setLoading(true)
+
+    try {
+      await login(email, password)
       navigate('/')
+    } catch (err) {
+      setError(err.response?.data?.error || 'Login failed')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -167,7 +176,21 @@ export default function Login() {
           />
         </label>
 
-        <button type="submit" style={{
+        {error && (
+          <div style={{
+            padding: '12px 16px',
+            background: 'rgba(255, 59, 48, 0.1)',
+            border: '1px solid rgba(255, 59, 48, 0.3)',
+            borderRadius: 8,
+            color: '#ff3b30',
+            fontSize: '0.9em',
+            textAlign: 'center'
+          }}>
+            {error}
+          </div>
+        )}
+
+        <button type="submit" disabled={loading} style={{
           padding: '14px 24px',
           background: 'linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)',
           color: '#000',
@@ -190,18 +213,21 @@ export default function Login() {
             e.currentTarget.style.transform = 'translateY(0)'
             e.currentTarget.style.boxShadow = '0 8px 24px rgba(255, 255, 255, 0.3)'
           }}>
-          Sign In →
+          {loading ? 'Signing In...' : 'Sign In →'}
         </button>
 
         <p style={{
           textAlign: 'center',
           color: 'rgba(255, 255, 255, 0.5)',
-          fontSize: '0.85em',
+          fontSize: '0.9em',
           margin: '8px 0 0',
           position: 'relative',
           zIndex: 1
         }}>
-          Enter any email and password to continue
+          Don't have an account?{' '}
+          <Link to="/register" style={{ color: '#fff', textDecoration: 'none', fontWeight: 600 }}>
+            Create Account
+          </Link>
         </p>
       </form>
     </div>

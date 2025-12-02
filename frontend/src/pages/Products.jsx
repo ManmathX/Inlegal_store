@@ -1,30 +1,20 @@
-import { useEffect, useMemo, useState } from 'react'
-
-const API = 'http://localhost:3001'
+import { useEffect, useState } from 'react'
+import { productAPI } from '../services/api'
+import { useCart } from '../CartContext'
 
 export default function Products() {
-  const [rows, setRows] = useState([])
+  const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [priceCents, setPriceCents] = useState('')
-
-  async function fetchJSON(url, opts) {
-    const res = await fetch(url, opts)
-    const text = await res.text()
-    let data = null
-    try { data = text ? JSON.parse(text) : null } catch { }
-    if (!res.ok) throw new Error((data && (data.error || data.message)) || res.statusText)
-    return data
-  }
+  const { addToCart } = useCart()
+  const [addedProducts, setAddedProducts] = useState(new Set())
 
   async function load() {
     setError('')
     setLoading(true)
     try {
-      const data = await fetchJSON(API + '/product')
-      setRows(data)
+      const res = await productAPI.getProducts()
+      setProducts(res.data)
     } catch (e) {
       setError(String(e.message || e))
     } finally {
@@ -32,112 +22,19 @@ export default function Products() {
     }
   }
 
-  async function onSubmit(e) {
-    e.preventDefault()
-    setError('')
-    try {
-      await fetchJSON(API + '/product', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), description: description.trim(), priceCents: Number(priceCents) })
-      })
-      setName('')
-      setDescription('')
-      setPriceCents('')
-      load()
-    } catch (e) {
-      setError(String(e.message || e))
-    }
-  }
-
-  async function onDelete(id) {
-    setError('')
-    try {
-      await fetchJSON(API + '/product/' + id, { method: 'DELETE' })
-      load()
-    } catch (e) { setError(String(e.message || e)) }
-  }
-
-  async function onEdit(row) {
-    const newName = window.prompt('Name', row.name)
-    if (newName == null) return
-    const newDesc = window.prompt('Description', row.description || '')
-    if (newDesc == null) return
-    const newPrice = window.prompt('Price (cents)', String(row.priceCents))
-    if (newPrice == null) return
-    setError('')
-    try {
-      await fetchJSON(API + '/product/' + row.id, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newName, description: newDesc, priceCents: Number(newPrice) })
-      })
-      load()
-    } catch (e) { setError(String(e.message || e)) }
-  }
-
   useEffect(() => { load() }, [])
 
-  const rowsView = useMemo(() => (
-    rows.map(r => (
-      <tr key={r.id} style={{
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-        transition: 'all 0.3s ease'
-      }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = 'transparent'
-        }}>
-        <td style={{ padding: 12, color: 'rgba(255, 255, 255, 0.9)' }}>{r.id}</td>
-        <td style={{ padding: 12, color: '#fff', fontWeight: 500 }}>{r.name}</td>
-        <td style={{ padding: 12, color: 'rgba(255, 255, 255, 0.7)' }}>{r.description || ''}</td>
-        <td style={{ padding: 12, color: '#fff', fontWeight: 600 }}>{new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format((Number(r.priceCents) || 0) / 100)}</td>
-        <td style={{ padding: 12 }}>
-          <button onClick={() => onEdit(r)} style={{
-            marginRight: 8,
-            padding: '6px 14px',
-            background: 'rgba(255, 255, 255, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            color: '#fff',
-            borderRadius: 6,
-            cursor: 'pointer',
-            fontSize: '0.9em',
-            fontWeight: 500,
-            transition: 'all 0.2s ease'
-          }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
-            }}>
-            Edit
-          </button>
-          <button onClick={() => onDelete(r.id)} style={{
-            padding: '6px 14px',
-            background: 'rgba(220, 38, 38, 0.2)',
-            border: '1px solid rgba(220, 38, 38, 0.3)',
-            color: '#ff6b6b',
-            borderRadius: 6,
-            cursor: 'pointer',
-            fontSize: '0.9em',
-            fontWeight: 500,
-            transition: 'all 0.2s ease'
-          }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(220, 38, 38, 0.3)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(220, 38, 38, 0.2)'
-            }}>
-            Delete
-          </button>
-        </td>
-      </tr>
-    ))
-  ), [rows])
+  const handleAddToCart = (product) => {
+    addToCart(product, 1)
+    setAddedProducts(prev => new Set([...prev, product.id]))
+    setTimeout(() => {
+      setAddedProducts(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(product.id)
+        return newSet
+      })
+    }, 2000)
+  }
 
   return (
     <div style={{ color: '#fff' }}>
@@ -150,115 +47,10 @@ export default function Products() {
         margin: '0 0 32px 0',
         fontWeight: 700
       }}>
-        Product Management
+        Product Catalog
       </h2>
 
-      <form onSubmit={onSubmit} style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr 1fr auto',
-        gap: 12,
-        marginBottom: 24,
-        padding: 24,
-        background: 'rgba(20, 20, 20, 0.7)',
-        backdropFilter: 'blur(20px)',
-        borderRadius: 16,
-        border: '1px solid rgba(255, 255, 255, 0.1)'
-      }}>
-        <input
-          placeholder="Product Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          style={{
-            padding: '12px 16px',
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            borderRadius: 8,
-            color: '#fff',
-            fontSize: '1em',
-            transition: 'all 0.3s ease'
-          }}
-          onFocus={(e) => {
-            e.currentTarget.style.borderColor = '#ffffff'
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)'
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
-          }}
-        />
-        <input
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          style={{
-            padding: '12px 16px',
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            borderRadius: 8,
-            color: '#fff',
-            fontSize: '1em',
-            transition: 'all 0.3s ease'
-          }}
-          onFocus={(e) => {
-            e.currentTarget.style.borderColor = '#ffffff'
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)'
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
-          }}
-        />
-        <input
-          placeholder="Price (cents)"
-          type="number"
-          min="0"
-          value={priceCents}
-          onChange={(e) => setPriceCents(e.target.value)}
-          required
-          style={{
-            padding: '12px 16px',
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            borderRadius: 8,
-            color: '#fff',
-            fontSize: '1em',
-            transition: 'all 0.3s ease'
-          }}
-          onFocus={(e) => {
-            e.currentTarget.style.borderColor = '#ffffff'
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)'
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
-          }}
-        />
-        <button type="submit" style={{
-          padding: '12px 24px',
-          background: 'linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)',
-          border: 0,
-          borderRadius: 8,
-          color: '#000',
-          fontSize: '1em',
-          fontWeight: 600,
-          cursor: 'pointer',
-          transition: 'all 0.3s ease',
-          boxShadow: '0 4px 15px rgba(255, 255, 255, 0.2)'
-        }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)'
-            e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 255, 255, 0.3)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)'
-            e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 255, 255, 0.2)'
-          }}>
-          Add Product
-        </button>
-      </form>
-
-      {error ? (
+      {error && (
         <div style={{
           color: '#ff6b6b',
           background: 'rgba(220, 38, 38, 0.1)',
@@ -269,9 +61,9 @@ export default function Products() {
         }}>
           ⚠️ {error}
         </div>
-      ) : null}
+      )}
 
-      {loading ? (
+      {loading && (
         <div style={{
           color: 'rgba(255, 255, 255, 0.7)',
           textAlign: 'center',
@@ -279,32 +71,99 @@ export default function Products() {
         }}>
           Loading products...
         </div>
-      ) : null}
+      )}
 
       <div style={{
-        background: 'rgba(20, 20, 20, 0.7)',
-        backdropFilter: 'blur(20px)',
-        borderRadius: 16,
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        overflow: 'hidden'
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+        gap: 20
       }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{
-              borderBottom: '2px solid rgba(255, 255, 255, 0.1)',
-              background: 'rgba(255, 255, 255, 0.05)'
+        {products.map(product => (
+          <div key={product.id} style={{
+            background: 'rgba(20, 20, 20, 0.7)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: 16,
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            padding: 24,
+            display: 'flex',
+            flexDirection: 'column',
+            transition: 'all 0.3s ease'
+          }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)'
+              e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.5)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = 'none'
             }}>
-              <th style={{ textAlign: 'left', padding: 16, color: 'rgba(255, 255, 255, 0.9)', fontWeight: 600 }}>ID</th>
-              <th style={{ textAlign: 'left', padding: 16, color: 'rgba(255, 255, 255, 0.9)', fontWeight: 600 }}>Name</th>
-              <th style={{ textAlign: 'left', padding: 16, color: 'rgba(255, 255, 255, 0.9)', fontWeight: 600 }}>Description</th>
-              <th style={{ textAlign: 'left', padding: 16, color: 'rgba(255, 255, 255, 0.9)', fontWeight: 600 }}>Price</th>
-              <th style={{ textAlign: 'left', padding: 16, color: 'rgba(255, 255, 255, 0.9)', fontWeight: 600 }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rowsView}
-          </tbody>
-        </table>
+            <div style={{
+              width: '100%',
+              height: 180,
+              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+              borderRadius: 12,
+              marginBottom: 16,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '3em'
+            }}>
+              {product.category === 'Apparel' ? '👕' :
+                product.category === 'Tech' ? '💻' :
+                  product.category === 'Home' ? '🏠' : '🎁'}
+            </div>
+
+            <h3 style={{ margin: '0 0 8px 0', fontSize: '1.2em', fontWeight: 600 }}>
+              {product.name}
+            </h3>
+
+            <p style={{
+              margin: '0 0 12px 0',
+              color: 'rgba(255, 255, 255, 0.6)',
+              fontSize: '0.9em',
+              flex: 1,
+              lineHeight: 1.5
+            }}>
+              {product.description}
+            </p>
+
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 12
+            }}>
+              <span style={{ fontSize: '1.5em', fontWeight: 700, color: '#4cd964' }}>
+                ${(product.price / 100).toFixed(2)}
+              </span>
+              <span style={{ fontSize: '0.85em', color: 'rgba(255, 255, 255, 0.5)' }}>
+                Stock: {product.stock}
+              </span>
+            </div>
+
+            <button
+              onClick={() => handleAddToCart(product)}
+              disabled={product.stock === 0}
+              style={{
+                padding: '12px 20px',
+                background: addedProducts.has(product.id)
+                  ? 'rgba(76, 217, 100, 0.2)'
+                  : product.stock === 0
+                    ? 'rgba(255, 255, 255, 0.1)'
+                    : 'linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)',
+                border: addedProducts.has(product.id) ? '1px solid rgba(76, 217, 100, 0.4)' : 0,
+                borderRadius: 8,
+                color: addedProducts.has(product.id) ? '#4cd964' : product.stock === 0 ? 'rgba(255, 255, 255, 0.4)' : '#000',
+                fontSize: '1em',
+                fontWeight: 600,
+                cursor: product.stock === 0 ? 'not-allowed' : 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              {addedProducts.has(product.id) ? '✓ Added to Cart' : product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   )

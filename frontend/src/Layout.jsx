@@ -1,8 +1,10 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from './AuthContext'
+import { useCart } from './CartContext'
 
 export default function Layout() {
-  const { logout } = useAuth()
+  const { user, logout } = useAuth()
+  const { getCartCount } = useCart()
   const navigate = useNavigate()
 
   function handleLogout() {
@@ -108,30 +110,94 @@ export default function Layout() {
               }}>
               📞 Contact
             </Link>
+            {(user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN' || user?.role === 'MODERATOR') && (
+              <Link to="/admin" style={{
+                color: 'rgba(255, 149, 0, 0.9)',
+                textDecoration: 'none',
+                padding: '8px 16px',
+                borderRadius: 8,
+                transition: 'all 0.3s ease',
+                fontWeight: 600,
+                background: 'rgba(255, 149, 0, 0.1)',
+                border: '1px solid rgba(255, 149, 0, 0.3)'
+              }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 149, 0, 0.2)'
+                  e.currentTarget.style.color = '#ff9500'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 149, 0, 0.1)'
+                  e.currentTarget.style.color = 'rgba(255, 149, 0, 0.9)'
+                }}>
+                🛡️ Admin
+              </Link>
+            )}
           </div>
         </div>
-        <button onClick={handleLogout} style={{
-          background: 'linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)',
-          color: '#000',
-          border: 0,
-          padding: '10px 24px',
-          borderRadius: 10,
-          cursor: 'pointer',
-          fontWeight: 600,
-          fontSize: '0.95em',
-          boxShadow: '0 4px 15px rgba(255, 255, 255, 0.2)',
-          transition: 'all 0.3s ease'
-        }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)'
-            e.currentTarget.style.boxShadow = '0 6px 25px rgba(255, 255, 255, 0.3)'
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <Link to="/cart" style={{
+            position: 'relative',
+            padding: '8px 16px',
+            background: 'rgba(255, 255, 255, 0.1)',
+            borderRadius: 10,
+            textDecoration: 'none',
+            color: '#fff',
+            fontSize: '1.2em',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8
           }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)'
-            e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 255, 255, 0.2)'
-          }}>
-          Logout
-        </button>
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
+            }}>
+            🛒
+            {getCartCount() > 0 && (
+              <span style={{
+                position: 'absolute',
+                top: -4,
+                right: -4,
+                background: '#ff3b30',
+                color: '#fff',
+                borderRadius: '50%',
+                width: 20,
+                height: 20,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.7em',
+                fontWeight: 700
+              }}>
+                {getCartCount()}
+              </span>
+            )}
+          </Link>
+          <button onClick={handleLogout} style={{
+            background: 'linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)',
+            color: '#000',
+            border: 0,
+            padding: '10px 24px',
+            borderRadius: 10,
+            cursor: 'pointer',
+            fontWeight: 600,
+            fontSize: '0.95em',
+            boxShadow: '0 4px 15px rgba(255, 255, 255, 0.2)',
+            transition: 'all 0.3s ease'
+          }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.boxShadow = '0 6px 25px rgba(255, 255, 255, 0.3)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 255, 255, 0.2)'
+            }}>
+            Logout
+          </button>
+        </div>
       </nav>
       <main style={{
         flex: 1,

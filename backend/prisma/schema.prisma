@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,25 +9,263 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-model User{
-  id Int @id @default(autoincrement())
-  name String
-  email String
-  password String?
-  post post []
+
+// --------------------------------------
+// Enums
+// --------------------------------------
+
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+  SUPER_ADMIN
 }
-model post{
-   id Int @id @default(autoincrement())
-   title String
-   description String
-   user  User     @relation(fields: [userId], references: [id])
-   userId Int
+
+enum PostStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FLAGGED
 }
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum ActionType {
+  CREATE
+  UPDATE
+  DELETE
+  APPROVE
+  REJECT
+  FLAG
+  BAN
+  UNBAN
+}
+
+// --------------------------------------
+// User & Auth Models
+// --------------------------------------
+
+model User {
+  id            Int       @id @default(autoincrement())
+  name          String
+  email         String    @unique
+  password      String?   // Nullable for OAuth users
+  role          Role      @default(USER)
+  
+  // Profile info
+  bio           String?   @db.Text
+  profileImage  String?
+  reputation    Int       @default(0)
+  
+  // Status flags
+  isActive      Boolean   @default(true)
+  isBanned      Boolean   @default(false)
+  bannedReason  String?   @db.Text
+  bannedAt      DateTime?
+  bannedBy      Int?
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+
+  // Relations
+  posts         Post[]      @relation("UserPosts")
+  comments      Comment[]
+  votes         Vote[]
+  orders        Order[]
+  
+  // Admin relations
+  adminProfile  Admin?      @relation("AdminProfile")
+  auditLogs     AuditLog[]  @relation("AdminActions")
+  
+  // Self-relations for banning
+  bannedUsers   User[]      @relation("BannedBy")
+  bannedByUser  User?       @relation("BannedBy", fields: [bannedBy], references: [id])
+
+  @@index([email])
+  @@index([role])
+}
+
+model Admin {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @unique
+  department      String?
+  
+  // Permissions
+  permissions     String   @db.Text // Stored as JSON
+  canBanUsers     Boolean  @default(false)
+  canDeletePosts  Boolean  @default(false)
+  canApprovePosts Boolean  @default(true)
+  canManageUsers  Boolean  @default(false)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation("AdminProfile", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// --------------------------------------
+// Content Models
+// --------------------------------------
+
+model Post {
+  id              Int        @id @default(autoincrement())
+  title           String
+  description     String     @db.Text
+  category        String?
+  status          PostStatus @default(PENDING)
+  isLegal         Boolean    @default(true) // The "feels illegal" flag
+  
+  // Metrics
+  upvotes         Int        @default(0)
+  downvotes       Int        @default(0)
+  viewCount       Int        @default(0)
+  
+  // Featured status
+  isFeatured      Boolean    @default(false)
+  featuredAt      DateTime?
+
+  // Moderation info
+  approvedAt      DateTime?
+  approvedBy      Int?
+  rejectedAt      DateTime?
+  rejectedBy      Int?
+  rejectionReason String?    @db.Text
+
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  // Relations
+  userId          Int
+  user            User       @relation("UserPosts", fields: [userId], references: [id], onDelete: Cascade)
+  comments        Comment[]
+  votes           Vote[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([category])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.Text
+  
+  // Soft delete
+  isDeleted Boolean  @default(false)
+  deletedAt DateTime?
+  deletedBy Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  postId    Int
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([userId])
+}
+
+model Vote {
+  id        Int      @id @default(autoincrement())
+  isUpvote  Boolean
+  createdAt DateTime @default(now())
+
+  postId    Int
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([postId])
+}
+
+// --------------------------------------
+// E-commerce Models
+// --------------------------------------
+
 model Product {
   id          Int      @id @default(autoincrement())
   name        String
-  description String?
-  priceCents  Int
+  description String?  @db.Text
+  price       Int      // Stored in cents
+  stock       Int      @default(0)
+  isActive    Boolean  @default(true)
+  imageUrl    String?
+  category    String?
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  orderItems  OrderItem[]
+
+  @@index([category])
+  @@index([isActive])
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  status      OrderStatus @default(PENDING)
+  total       Int         // Total in cents
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  userId      Int
+  user        User        @relation(fields: [userId], references: [id])
+  items       OrderItem[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  quantity  Int
+  price     Int     // Snapshot price in cents
+  
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+// --------------------------------------
+// System Models
+// --------------------------------------
+
+model AuditLog {
+  id          Int        @id @default(autoincrement())
+  action      ActionType
+  targetType  String     // Post, User, Comment, etc.
+  targetId    Int
+  details     String?    @db.Text // JSON details
+  
+  // Request info
+  ipAddress   String?
+  userAgent   String?    @db.Text
+  
+  createdAt   DateTime   @default(now())
+
+  adminId     Int
+  admin       User       @relation("AdminActions", fields: [adminId], references: [id])
+
+  @@index([adminId])
+  @@index([action])
+  @@index([createdAt])
 }

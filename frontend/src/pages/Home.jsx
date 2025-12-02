@@ -1,27 +1,46 @@
-import { useMemo } from 'react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { postAPI } from '../services/api'
 import './Home.css'
 
 export default function Home() {
-  const inlegalItems = [
-    { name: 'Mattress Tag Removal Tool', description: 'A small pair of scissors for legally removing that "Do Not Remove" tag. Feel the rush of minor rebellion.', icon: '✂️' },
-    { name: 'The Fast Lane Token', description: 'A legal right to use the fast lane with no other cars in sight. Pure, unadulterated speed (limit applies).', icon: '🚗' },
-    { name: 'Bulk Cash Carrier', description: 'A briefcase optimized for carrying large, legally acquired sums of cash. Look suspicious, be innocent.', icon: '💰' },
-    { name: 'Public Domain Music Collection', description: 'A vast collection of music that feels copyrighted, but is perfectly free to use. Pirate vibes, zero guilt.', icon: '🎶' },
-    { name: 'Expired License ID', description: 'A novelty ID that strongly resembles your old, expired one—for emergencies only. (Not valid identification).', icon: '🪪' },
-    { name: 'Gravel Road Speed Pass', description: 'A document legally allowing you to drive 5 MPH over the limit on unpaved roads. Live on the edge.', icon: '💨' },
-  ]
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
 
-  const itemsView = useMemo(() => (
-    inlegalItems.map((item, index) => (
-      <div key={index} className="item-card">
-        <div className="item-icon-wrapper">
-          {item.icon}
-        </div>
-        <h3 className="item-title">{item.name}</h3>
-        <p className="item-description">{item.description}</p>
-      </div>
-    ))
-  ), [])
+  useEffect(() => {
+    fetchPosts()
+  }, [])
+
+  const fetchPosts = async () => {
+    try {
+      const res = await postAPI.getPosts({ sort: 'popular' })
+      setPosts(res.data)
+    } catch (err) {
+      setError('Failed to load posts')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleVote = async (postId, isUpvote) => {
+    try {
+      await postAPI.votePost(postId, isUpvote)
+      // Refresh posts to get updated vote counts
+      fetchPosts()
+    } catch (err) {
+      console.error('Vote failed:', err)
+    }
+  }
+
+  if (loading) {
+    return <div className="home-container" style={{ textAlign: 'center', padding: '40px' }}>Loading posts...</div>
+  }
+
+  if (error) {
+    return <div className="home-container" style={{ textAlign: 'center', padding: '40px', color: '#ff3b30' }}>{error}</div>
+  }
 
   return (
     <div className="home-container">
@@ -31,8 +50,8 @@ export default function Home() {
           The Black Market <br /> of Legalities
         </h1>
         <p className="hero-subtitle">
-          Welcome to the gray area. These items are perfectly legal to possess and use.
-          But they feel... wrong. And that's exactly why you want them.
+          Welcome to the gray area. Share things that are perfectly legal to do,
+          but feel... wrong. And that's exactly why we love them.
         </p>
       </section>
 
@@ -41,13 +60,13 @@ export default function Home() {
           <h2>Why do we do this?</h2>
           <p>
             In a world of strict rules and endless regulations, sometimes you just want to feel a little... off the grid.
-            We curate objects that give you the thrill of the illicit with the safety of the mundane.
+            We curate experiences that give you the thrill of the illicit with the safety of the mundane.
           </p>
           <p>
             It's not about breaking the law. It's about bending the vibe.
           </p>
           <div className="human-quote">
-            "It feels like I shouldn't have this. I love it." — Anonymous Customer
+            "It feels like I shouldn't have done this. I love it." — Anonymous User
           </div>
         </div>
         <div className="human-visual">
@@ -56,15 +75,85 @@ export default function Home() {
       </section>
 
       <div className="items-grid">
-        {itemsView}
+        {posts.length === 0 ? (
+          <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'rgba(255,255,255,0.6)' }}>
+            No posts yet. Be the first to share an inlegal moment!
+          </div>
+        ) : (
+          posts.map((post) => (
+            <div key={post.id} className="item-card">
+              <div className="item-icon-wrapper">
+                {post.isLegal ? '✅' : '⚠️'}
+              </div>
+              <h3 className="item-title">{post.title}</h3>
+              <p className="item-description">{post.description}</p>
+              <div style={{
+                display: 'flex',
+                gap: '12px',
+                marginTop: '12px',
+                alignItems: 'center',
+                fontSize: '0.9em',
+                color: 'rgba(255,255,255,0.6)'
+              }}>
+                <button
+                  onClick={() => handleVote(post.id, true)}
+                  style={{
+                    background: 'rgba(76, 217, 100, 0.1)',
+                    border: '1px solid rgba(76, 217, 100, 0.3)',
+                    color: '#4cd964',
+                    padding: '6px 12px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '0.9em',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(76, 217, 100, 0.2)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(76, 217, 100, 0.1)'}
+                >
+                  ▲ {post.upvotes}
+                </button>
+                <button
+                  onClick={() => handleVote(post.id, false)}
+                  style={{
+                    background: 'rgba(255, 59, 48, 0.1)',
+                    border: '1px solid rgba(255, 59, 48, 0.3)',
+                    color: '#ff3b30',
+                    padding: '6px 12px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '0.9em',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 59, 48, 0.2)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 59, 48, 0.1)'}
+                >
+                  ▼ {post.downvotes}
+                </button>
+                <span>👁 {post.viewCount}</span>
+                <span>💬 {post._count?.comments || 0}</span>
+              </div>
+              <div style={{
+                marginTop: '8px',
+                fontSize: '0.85em',
+                color: 'rgba(255,255,255,0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <span>by {post.user?.name}</span>
+                {post.category && <span>• {post.category}</span>}
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <section className="cta-section">
-        <h2 className="cta-title">Join the Inner Circle</h2>
+        <h2 className="cta-title">Share Your Inlegal Moment</h2>
         <p className="cta-text">
-          Get notified when we drop new "contraband". No spam, just pure legal adrenaline.
+          Have you done something perfectly legal that felt illegal? Share it with the community!
         </p>
-        <button className="cta-button">Get Access</button>
+        <button className="cta-button" onClick={() => navigate('/create-post')}>Create Post</button>
       </section>
     </div>
   )
