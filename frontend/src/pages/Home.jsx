@@ -45,39 +45,42 @@ export default function Home() {
   return (
     <div className="home-container">
       <section className="hero-section">
-        <span className="hero-badge">ZERO PROOF HUB</span>
+        <span className="hero-badge">EST. 2024</span>
         <h1 className="hero-title">
-          The Black Market <br /> of Legalities
+          Things that are totally legal<br />
+          but feel kinda sketchy
         </h1>
         <p className="hero-subtitle">
-          Welcome to the gray area. Share things that are perfectly legal to do,
-          but feel... wrong. And that's exactly why we love them.
+          You know that feeling when you're doing something completely above board,
+          but you still look over your shoulder? Yeah, we collect those moments.
         </p>
       </section>
 
       <section className="human-section">
         <div className="human-content">
-          <h2>Why do we do this?</h2>
+          <h2>What's this about?</h2>
           <p>
-            In a world of strict rules and endless regulations, sometimes you just want to feel a little... off the grid.
-            We curate experiences that give you the thrill of the illicit with the safety of the mundane.
+            Ever removed that mattress tag? Walked out of a store without buying anything?
+            Used the bathroom at Starbucks without ordering? Congrats, you're one of us.
           </p>
           <p>
-            It's not about breaking the law. It's about bending the vibe.
+            This is where we share those perfectly legal activities that somehow
+            make you feel like a criminal mastermind.
           </p>
           <div className="human-quote">
-            "It feels like I shouldn't have done this. I love it." — Anonymous User
+            "I walked into a store, browsed for 20 minutes, and left empty-handed.
+            The guilt was real." — @sarah_k
           </div>
         </div>
         <div className="human-visual">
-          🤫
+          👀
         </div>
       </section>
 
       <div className="items-grid">
         {posts.length === 0 ? (
           <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'rgba(255,255,255,0.6)' }}>
-            No posts yet. Be the first to share an inlegal moment!
+            Nothing here yet. Be the brave soul who posts first.
           </div>
         ) : (
           posts.map((post) => (
@@ -149,11 +152,14 @@ export default function Home() {
       </div>
 
       <section className="cta-section">
-        <h2 className="cta-title">Share Your Inlegal Moment</h2>
+        <h2 className="cta-title">Got a story?</h2>
         <p className="cta-text">
-          Have you done something perfectly legal that felt illegal? Share it with the community!
+          Share your perfectly legal but somehow suspicious moment with the community.
+          We promise we won't judge (much).
         </p>
-        <button className="cta-button" onClick={() => navigate('/create-post')}>Create Post</button>
+        <button className="cta-button" onClick={() => navigate('/create-post')}>
+          Share Your Story
+        </button>
       </section>
     </div>
   )

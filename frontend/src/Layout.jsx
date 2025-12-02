@@ -20,77 +20,86 @@ export default function Layout() {
       flexDirection: 'column',
     }}>
       <nav style={{
-        background: 'rgba(20, 20, 20, 0.95)',
+        background: 'rgba(15, 15, 15, 0.98)',
         backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         color: 'white',
-        padding: '16px 32px',
+        padding: '14px 28px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         position: 'sticky',
         top: 0,
         zIndex: 1000,
-        boxShadow: '0 4px 30px rgba(0, 0, 0, 0.5)'
+        boxShadow: '0 2px 20px rgba(0, 0, 0, 0.4)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-          <div style={{ fontSize: '1.5em', fontWeight: 'bold', color: '#fff', letterSpacing: '-0.02em' }}>
-            💊 Inlegal Store
+        <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
+          <div style={{
+            fontSize: '1.4em',
+            fontWeight: '800',
+            color: '#fff',
+            letterSpacing: '-0.03em',
+            fontFamily: 'monospace'
+          }}>
+            INLEGAL<span style={{ color: '#888' }}>.store</span>
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 6 }}>
             <Link to="/" style={{
-              color: 'rgba(255, 255, 255, 0.7)',
+              color: 'rgba(255, 255, 255, 0.75)',
               textDecoration: 'none',
-              padding: '8px 16px',
-              borderRadius: 8,
-              transition: 'all 0.3s ease',
-              fontWeight: 500
+              padding: '7px 14px',
+              borderRadius: 6,
+              transition: 'all 0.2s ease',
+              fontWeight: 500,
+              fontSize: '0.95em'
             }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'
                 e.currentTarget.style.color = '#fff'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent'
-                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'
+                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.75)'
               }}>
-              🏠 Home
+              Feed
             </Link>
             <Link to="/products" style={{
-              color: 'rgba(255, 255, 255, 0.7)',
+              color: 'rgba(255, 255, 255, 0.75)',
               textDecoration: 'none',
-              padding: '8px 16px',
-              borderRadius: 8,
-              transition: 'all 0.3s ease',
-              fontWeight: 500
+              padding: '7px 14px',
+              borderRadius: 6,
+              transition: 'all 0.2s ease',
+              fontWeight: 500,
+              fontSize: '0.95em'
             }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'
                 e.currentTarget.style.color = '#fff'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent'
-                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'
+                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.75)'
               }}>
-              📦 Products
+              Shop
             </Link>
             <Link to="/about" style={{
-              color: 'rgba(255, 255, 255, 0.7)',
+              color: 'rgba(255, 255, 255, 0.75)',
               textDecoration: 'none',
-              padding: '8px 16px',
-              borderRadius: 8,
-              transition: 'all 0.3s ease',
-              fontWeight: 500
+              padding: '7px 14px',
+              borderRadius: 6,
+              transition: 'all 0.2s ease',
+              fontWeight: 500,
+              fontSize: '0.95em'
             }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'
                 e.currentTarget.style.color = '#fff'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent'
-                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'
+                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.75)'
               }}>
-              ℹ️ About
+              About
             </Link>
             <Link to="/contact" style={{
               color: 'rgba(255, 255, 255, 0.7)',
@@ -106,9 +115,9 @@ export default function Layout() {
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent'
-                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'
+                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.75)'
               }}>
-              📞 Contact
+              Contact
             </Link>
             {(user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN' || user?.role === 'MODERATOR') && (
               <Link to="/admin" style={{
@@ -224,7 +233,7 @@ export default function Layout() {
         backdropFilter: 'blur(10px)'
       }}>
         <p style={{ margin: 0, fontSize: '0.9em' }}>
-          © 2025 Inlegal Store - Where Legal Meets Questionable
+          © 2024 INLEGAL.store — Probably legal, definitely questionable
         </p>
       </footer>
     </div>

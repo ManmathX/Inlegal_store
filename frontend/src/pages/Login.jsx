@@ -226,7 +226,7 @@ export default function Login() {
         }}>
           Don't have an account?{' '}
           <Link to="/register" style={{ color: '#fff', textDecoration: 'none', fontWeight: 600 }}>
-            Create Account
+            Sign up here
           </Link>
         </p>
       </form>

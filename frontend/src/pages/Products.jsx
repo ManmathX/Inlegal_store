@@ -47,7 +47,7 @@ export default function Products() {
         margin: '0 0 32px 0',
         fontWeight: 700
       }}>
-        Product Catalog
+        Merch & Stuff
       </h2>
 
       {error && (
@@ -75,95 +75,124 @@ export default function Products() {
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-        gap: 20
+        gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+        gap: 18,
+        gridAutoRows: 'auto'
       }}>
-        {products.map(product => (
-          <div key={product.id} style={{
-            background: 'rgba(20, 20, 20, 0.7)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: 16,
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            padding: 24,
-            display: 'flex',
-            flexDirection: 'column',
-            transition: 'all 0.3s ease'
-          }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-4px)'
-              e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.5)'
+        {products.map((product, index) => {
+          const colors = [
+            { bg: '#1a1a2e', accent: '#16213e' },
+            { bg: '#0f3460', accent: '#16213e' },
+            { bg: '#1a1a1a', accent: '#2d2d2d' },
+            { bg: '#1e1e1e', accent: '#2a2a2a' },
+          ];
+          const color = colors[index % colors.length];
+          const isWide = index % 5 === 0;
+
+          return (
+            <div key={product.id} style={{
+              background: `linear-gradient(135deg, ${color.bg} 0%, ${color.accent} 100%)`,
+              borderRadius: 14,
+              border: '1px solid rgba(255, 255, 255, 0.06)',
+              padding: 22,
+              display: 'flex',
+              flexDirection: 'column',
+              transition: 'all 0.25s ease',
+              gridColumn: isWide ? 'span 2' : 'span 1',
+              transform: index % 3 === 0 ? 'rotate(-0.5deg)' : index % 3 === 1 ? 'rotate(0.5deg)' : 'none'
             }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.boxShadow = 'none'
-            }}>
-            <div style={{
-              width: '100%',
-              height: 180,
-              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
-              borderRadius: 12,
-              marginBottom: 16,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '3em'
-            }}>
-              {product.category === 'Apparel' ? '👕' :
-                product.category === 'Tech' ? '💻' :
-                  product.category === 'Home' ? '🏠' : '🎁'}
-            </div>
-
-            <h3 style={{ margin: '0 0 8px 0', fontSize: '1.2em', fontWeight: 600 }}>
-              {product.name}
-            </h3>
-
-            <p style={{
-              margin: '0 0 12px 0',
-              color: 'rgba(255, 255, 255, 0.6)',
-              fontSize: '0.9em',
-              flex: 1,
-              lineHeight: 1.5
-            }}>
-              {product.description}
-            </p>
-
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: 12
-            }}>
-              <span style={{ fontSize: '1.5em', fontWeight: 700, color: '#4cd964' }}>
-                ${(product.price / 100).toFixed(2)}
-              </span>
-              <span style={{ fontSize: '0.85em', color: 'rgba(255, 255, 255, 0.5)' }}>
-                Stock: {product.stock}
-              </span>
-            </div>
-
-            <button
-              onClick={() => handleAddToCart(product)}
-              disabled={product.stock === 0}
-              style={{
-                padding: '12px 20px',
-                background: addedProducts.has(product.id)
-                  ? 'rgba(76, 217, 100, 0.2)'
-                  : product.stock === 0
-                    ? 'rgba(255, 255, 255, 0.1)'
-                    : 'linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)',
-                border: addedProducts.has(product.id) ? '1px solid rgba(76, 217, 100, 0.4)' : 0,
-                borderRadius: 8,
-                color: addedProducts.has(product.id) ? '#4cd964' : product.stock === 0 ? 'rgba(255, 255, 255, 0.4)' : '#000',
-                fontSize: '1em',
-                fontWeight: 600,
-                cursor: product.stock === 0 ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s ease'
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-6px) rotate(0deg)'
+                e.currentTarget.style.boxShadow = '0 16px 48px rgba(0, 0, 0, 0.6)'
               }}
-            >
-              {addedProducts.has(product.id) ? '✓ Added to Cart' : product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-            </button>
-          </div>
-        ))}
+              onMouseLeave={(e) => {
+                const rotation = index % 3 === 0 ? 'rotate(-0.5deg)' : index % 3 === 1 ? 'rotate(0.5deg)' : 'rotate(0deg)';
+                e.currentTarget.style.transform = `translateY(0) ${rotation}`
+                e.currentTarget.style.boxShadow = 'none'
+              }}>
+              <div style={{
+                width: '100%',
+                height: isWide ? 140 : 160,
+                background: 'rgba(255, 255, 255, 0.03)',
+                borderRadius: 10,
+                marginBottom: 14,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '2.5em',
+                fontWeight: '900',
+                color: 'rgba(255, 255, 255, 0.15)',
+                fontFamily: 'monospace',
+                border: '2px dashed rgba(255, 255, 255, 0.08)'
+              }}>
+                {product.name.charAt(0)}
+              </div>
+
+              <h3 style={{
+                margin: '0 0 6px 0',
+                fontSize: index % 4 === 0 ? '1.15em' : '1.1em',
+                fontWeight: 600,
+                lineHeight: 1.3
+              }}>
+                {product.name}
+              </h3>
+
+              <p style={{
+                margin: '0 0 14px 0',
+                color: 'rgba(255, 255, 255, 0.55)',
+                fontSize: '0.88em',
+                flex: 1,
+                lineHeight: 1.5
+              }}>
+                {product.description}
+              </p>
+
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: 10,
+                paddingTop: 8,
+                borderTop: '1px solid rgba(255, 255, 255, 0.05)'
+              }}>
+                <span style={{
+                  fontSize: '1.4em',
+                  fontWeight: 700,
+                  color: '#4cd964',
+                  fontFamily: 'monospace'
+                }}>
+                  ${(product.price / 100).toFixed(2)}
+                </span>
+                <span style={{ fontSize: '0.8em', color: 'rgba(255, 255, 255, 0.4)' }}>
+                  {product.stock} left
+                </span>
+              </div>
+
+              <button
+                onClick={() => handleAddToCart(product)}
+                disabled={product.stock === 0}
+                style={{
+                  padding: '11px 18px',
+                  background: addedProducts.has(product.id)
+                    ? 'rgba(76, 217, 100, 0.15)'
+                    : product.stock === 0
+                      ? 'rgba(255, 255, 255, 0.05)'
+                      : 'rgba(255, 255, 255, 0.95)',
+                  border: addedProducts.has(product.id) ? '1px solid rgba(76, 217, 100, 0.3)' : 'none',
+                  borderRadius: 7,
+                  color: addedProducts.has(product.id) ? '#4cd964' : product.stock === 0 ? 'rgba(255, 255, 255, 0.3)' : '#000',
+                  fontSize: '0.92em',
+                  fontWeight: 600,
+                  cursor: product.stock === 0 ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s ease',
+                  textTransform: 'none'
+                }}
+              >
+                {addedProducts.has(product.id) ? '✓ Added' : product.stock === 0 ? 'Sold Out' : 'Add to Cart'}
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   )

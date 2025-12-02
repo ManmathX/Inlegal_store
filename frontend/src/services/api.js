@@ -1,7 +1,3 @@
-// API service using native fetch with Vite proxy
-// Vite proxy forwards /api/* to http://localhost:3001/api/*
-
-// Helper function to make authenticated requests
 async function fetchAPI(endpoint, options = {}) {
     const token = localStorage.getItem('token');
 
@@ -16,7 +12,6 @@ async function fetchAPI(endpoint, options = {}) {
 
     const response = await fetch(endpoint, config);
 
-    // Handle 401 Unauthorized
     if (response.status === 401) {
         localStorage.removeItem('token');
         window.location.href = '/login';
@@ -32,7 +27,6 @@ async function fetchAPI(endpoint, options = {}) {
     return { data, status: response.status };
 }
 
-// Auth API
 export const authAPI = {
     register: (userData) =>
         fetchAPI('/api/auth/register', {
@@ -49,7 +43,6 @@ export const authAPI = {
     getMe: () => fetchAPI('/api/auth/me'),
 };
 
-// Post API
 export const postAPI = {
     getPosts: (params = {}) => {
         const queryString = new URLSearchParams(params).toString();
@@ -71,18 +64,16 @@ export const postAPI = {
         }),
 };
 
-// Product API
 export const productAPI = {
     getProducts: () => fetchAPI('/api/products'),
 
     createOrder: (items) =>
-        fetchAPI('/api/products/order', {
+        fetchAPI('/api/products/orders', {
             method: 'POST',
             body: JSON.stringify({ items }),
         }),
 };
 
-// Admin API
 export const adminAPI = {
     getStats: () => fetchAPI('/api/admin/stats'),
 
