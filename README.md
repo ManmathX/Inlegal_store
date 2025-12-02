@@ -94,18 +94,15 @@ This is a college project, but we welcome feedback and suggestions!
 
 ## 👥 Team Members
 
-- [@the-carnage](https://github.com/the-carnage)
-- [@Aniruddh-13](https://github.com/Aniruddh-14)
-- [Add other team members
-]
+- [Mehebub Alom](https://github.com/the-carnage)
+- [Aniruddh Sharma](https://github.com/Aniruddh-14)
+- [Manmath Mohanty](https://github.com/ManmathX)
+- [Anuj Jain](https://github.com/ighackerbot)
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 📧 Contact
 
-Project Link: [https://github.com/the-carnage/Inlegal_store](https://github.com/the-carnage/Inlegal_store)
+Project Link: [https://github.com/ManmathX/Inlegal_store](https://github.com/ManmathX/Inlegal_store)
 
 ## 🙏 Acknowledgments
 
